@@ -23,6 +23,11 @@ function Main() {
   const handleCloseSign = () => {
     setSigninVisible(false);
   };
+  
+  const handleLoginSuccess = (user) => {
+    console.log("Logged in as:", user.email);
+    // Handle login success, maybe redirect to another page or update state
+  };
 
   return (
     <section className="main">
@@ -50,7 +55,7 @@ function Main() {
                 </button>
               </div>
             </div>
-            {isLoginVisible && <LogIn onClose={handleCloseLogin} />}
+            {isLoginVisible && <LogIn onClose={handleCloseLogin} onLoginSuccess={handleLoginSuccess} />}
             {isSigninVisivle && <Signin onClose={handleCloseSign} />}
           </div>
         </div>

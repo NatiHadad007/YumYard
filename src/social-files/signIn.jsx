@@ -1,6 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { HiX } from "react-icons/hi";
+import { auth,database } from '../firebase';
+import LogIn from "./logIn";
+import { ref, push, child, update,set } from "firebase/database";
+import {  createUserWithEmailAndPassword  } from "firebase/auth";
 
+console.log('t')
 function SignIn({ onClose }) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -8,37 +13,103 @@ function SignIn({ onClose }) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
-  const [userSignIn, setuserSignIn] = useState([]);
+  const [isPasswordMatch, setIsPasswordMatch] = useState(false);
+  const [allFieldsFilled, setAllFieldsFilled] = useState(false);
+  const [redirectToLogin, setRedirectToLogin] = useState(false); // State for redirecting to login
+
+  useEffect(() => {
+    // Check if all fields are filled
+    if (firstName && lastName && email && password && confirmPassword) {
+      setAllFieldsFilled(true);
+    } else {
+      setAllFieldsFilled(false);
+    }
+  }, [firstName, lastName, email, password, confirmPassword]);
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
-    if (id === "firstName") {
-      setFirstName(value);
-    }
-    if (id === "lastName") {
-      setLastName(value);
-    }
-    if (id === "email") {
-      setEmail(value);
-    }
-    if (id === "password") {
-      setPassword(value);
-    }
-    if (id === "confirmPassword") {
-      setConfirmPassword(value);
+    switch (id) {
+      case "firstName":
+        setFirstName(value);
+        break;
+      case "lastName":
+        setLastName(value);
+        break;
+      case "email":
+        setEmail(value);
+        break;
+      case "password":
+        setPassword(value);
+        break;
+      case "confirmPassword":
+        setConfirmPassword(value);
+        break;
+      default:
+        break;
     }
   };
 
   const handleSubmit = () => {
-    if (password === confirmPassword) {
-      console.log(firstName, lastName, email, password, confirmPassword);
-      //   setuserSignIn(firstName, lastName, email, password, confirmPassword);
-      setErrorMsg(""); // Clear error message on successful submit
-      //   console.log(userSignIn);
-    } else {
-      setErrorMsg("* Confirm password and password needs to be equal.");
+    if (!allFieldsFilled) {
+      setErrorMsg("* All fields are required.");
+      setIsPasswordMatch(false);
+      return;
     }
+
+    if (password === confirmPassword) {
+      setErrorMsg("");
+      
+      // let obj = {
+      //   firstName: firstName,
+      //   lastName: lastName,
+      //   email: email,
+      //   password: password,
+      //   confirmPassword: confirmPassword,
+      // };
+      // const newPostKey = push(child(ref(database), 'posts')).key;
+      // const updates = {};
+      // updates['/' + newPostKey] = obj;
+      // update(ref(database), updates).then(() => {
+      //   // Close the form after successful submission
+      //   onClose();
+      //   setRedirectToLogin(true); // Set redirect to login
+      // }).catch(error => {
+      //   // Handle the error here if needed
+      //   setErrorMsg(error.message);
+      // });
+           createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          const userId = user.uid;
+
+          // Save additional user info in Realtime Database
+          set(ref(database, 'users/' + userId), {
+            firstName: firstName,
+            lastName: lastName,
+            email: email
+          }).then(() => {
+            // Close the form and redirect to login
+            onClose();
+            setRedirectToLogin(true);
+          }).catch((error) => {
+            const errorMessage = error.message;
+            setErrorMsg(errorMessage);
+          });
+        })
+        .catch((error) => {
+          const errorMessage = error.message;
+          setErrorMsg(errorMessage);
+        });
+
+    } else {
+      setErrorMsg("* Confirm password and password need to be equal.");
+    }
+    setIsPasswordMatch(true);
   };
+
+  if (redirectToLogin) {
+    return <LogIn />; // Render the LogIn component if redirectToLogin is true
+  }
 
   return (
     <div className="logInPopupContainer">
@@ -114,8 +185,8 @@ function SignIn({ onClose }) {
             </div>
           </div>
           <div className="footer">
-            <button type="submit" className="btn" onClick={handleSubmit}>
-              Register
+            <button type="submit" className={`btn${allFieldsFilled ? ' btnSign' : ''}`} onClick={handleSubmit}>
+              Sign up
             </button>
           </div>
         </div>
