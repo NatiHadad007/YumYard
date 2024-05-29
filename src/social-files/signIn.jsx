@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { HiX } from "react-icons/hi";
-import { auth,database } from '../firebase';
+import { auth, database } from "../firebase";
 import LogIn from "./logIn";
-import { ref, push, child, update,set } from "firebase/database";
-import {  createUserWithEmailAndPassword  } from "firebase/auth";
+import { ref, push, child, update, set } from "firebase/database";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 
-console.log('t')
 function SignIn({ onClose }) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -58,49 +57,41 @@ function SignIn({ onClose }) {
 
     if (password === confirmPassword) {
       setErrorMsg("");
-      
-      // let obj = {
-      //   firstName: firstName,
-      //   lastName: lastName,
-      //   email: email,
-      //   password: password,
-      //   confirmPassword: confirmPassword,
-      // };
-      // const newPostKey = push(child(ref(database), 'posts')).key;
-      // const updates = {};
-      // updates['/' + newPostKey] = obj;
-      // update(ref(database), updates).then(() => {
-      //   // Close the form after successful submission
-      //   onClose();
-      //   setRedirectToLogin(true); // Set redirect to login
-      // }).catch(error => {
-      //   // Handle the error here if needed
-      //   setErrorMsg(error.message);
-      // });
-           createUserWithEmailAndPassword(auth, email, password)
+      createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
           const user = userCredential.user;
           const userId = user.uid;
 
-          // Save additional user info in Realtime Database
-          set(ref(database, 'users/' + userId), {
-            firstName: firstName,
-            lastName: lastName,
-            email: email
-          }).then(() => {
-            // Close the form and redirect to login
-            onClose();
-            setRedirectToLogin(true);
-          }).catch((error) => {
-            const errorMessage = error.message;
-            setErrorMsg(errorMessage);
-          });
+          // Update the user's profile to include the displayName
+          updateProfile(user, {
+            displayName: `${firstName} ${lastName}`,
+          })
+            .then(() => {
+              // Save additional user info in Realtime Database
+              set(ref(database, "users/" + userId), {
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
+              })
+                .then(() => {
+                  // Close the form and redirect to login
+                  onClose();
+                  setRedirectToLogin(true);
+                })
+                .catch((error) => {
+                  const errorMessage = error.message;
+                  setErrorMsg(errorMessage);
+                });
+            })
+            .catch((error) => {
+              const errorMessage = error.message;
+              setErrorMsg(errorMessage);
+            });
         })
         .catch((error) => {
           const errorMessage = error.message;
           setErrorMsg(errorMessage);
         });
-
     } else {
       setErrorMsg("* Confirm password and password need to be equal.");
     }
@@ -185,7 +176,11 @@ function SignIn({ onClose }) {
             </div>
           </div>
           <div className="footer">
-            <button type="submit" className={`btn${allFieldsFilled ? ' btnSign' : ''}`} onClick={handleSubmit}>
+            <button
+              type="submit"
+              className={`btn${allFieldsFilled ? " btnSign" : ""}`}
+              onClick={handleSubmit}
+            >
               Sign up
             </button>
           </div>

@@ -7,6 +7,7 @@ import Signin from "./signIn";
 function Main() {
   const [isLoginVisible, setIsLoginVisible] = useState(false);
   const [isSigninVisivle, setSigninVisible] = useState(false);
+  const [isUserName, setserName] = useState("");
 
   const handleLoginClick = () => {
     setIsLoginVisible(true);
@@ -23,9 +24,10 @@ function Main() {
   const handleCloseSign = () => {
     setSigninVisible(false);
   };
-  
+
   const handleLoginSuccess = (user) => {
-    console.log("Logged in as:", user.email);
+    // console.log("Logged in as:", user.displayName);
+    setserName(user.displayName);
     // Handle login success, maybe redirect to another page or update state
   };
 
@@ -47,15 +49,26 @@ function Main() {
             </div>
             <div className="profileDetailsSection">
               <div className="signOrLogContainer">
-                <button className="LogBtn" onClick={handleLoginClick}>
-                  Log in
-                </button>
-                <button className="SignBtn" onClick={handleSigninClick}>
-                  Sign Up
-                </button>
+                {isUserName ? (
+                  isUserName
+                ) : (
+                  <>
+                    <button className="LogBtn" onClick={handleLoginClick}>
+                      Log in
+                    </button>
+                    <button className="SignBtn" onClick={handleSigninClick}>
+                      Sign Up
+                    </button>
+                  </>
+                )}
               </div>
             </div>
-            {isLoginVisible && <LogIn onClose={handleCloseLogin} onLoginSuccess={handleLoginSuccess} />}
+            {isLoginVisible && (
+              <LogIn
+                onClose={handleCloseLogin}
+                onLoginSuccess={handleLoginSuccess}
+              />
+            )}
             {isSigninVisivle && <Signin onClose={handleCloseSign} />}
           </div>
         </div>
