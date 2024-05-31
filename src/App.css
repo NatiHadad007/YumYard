@@ -79,7 +79,8 @@ a.siteName-link {
 
 .signOrLogContainer {
   display: flex;
-  gap: 6px;
+  gap: 20px;
+  align-items: center;
 }
 
 .signOrLogContainer button {
