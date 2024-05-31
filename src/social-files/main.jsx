@@ -1,16 +1,28 @@
 import { Link } from "react-router-dom";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BiSearchAlt } from "react-icons/bi";
 import LogIn from "./logIn";
 import Signin from "./signIn";
 
 function Main() {
   const [isLoginVisible, setIsLoginVisible] = useState(false);
-  const [isSigninVisivle, setSigninVisible] = useState(false);
-  const [isUserName, setserName] = useState("");
+  const [isSigninVisible, setIsSigninVisible] = useState(false);
+  const [isUserName, setUserName] = useState("");
+
+  useEffect(() => {
+    const storedUsername = localStorage.getItem('username');
+    if (storedUsername) {
+      setUserName(storedUsername);
+    }
+  }, []);
 
   const handleLoginClick = () => {
     setIsLoginVisible(true);
+  };
+  
+  const handleLogoutClick = () => {
+    localStorage.removeItem('username');
+    setUserName("");
   };
 
   const handleCloseLogin = () => {
@@ -18,17 +30,17 @@ function Main() {
   };
 
   const handleSigninClick = () => {
-    setSigninVisible(true);
+    setIsSigninVisible(true);
   };
 
   const handleCloseSign = () => {
-    setSigninVisible(false);
+    setIsSigninVisible(false);
   };
 
   const handleLoginSuccess = (user) => {
-    // console.log("Logged in as:", user.displayName);
-    setserName(user.displayName);
-    // Handle login success, maybe redirect to another page or update state
+    localStorage.setItem('username', user.displayName);
+    setUserName(user.displayName);
+    setIsLoginVisible(false); // Close the login modal on successful login
   };
 
   return (
@@ -48,9 +60,14 @@ function Main() {
               />
             </div>
             <div className="profileDetailsSection">
-              <div className="signOrLogContainer">
+              <div className={`signOrLogContainer${isLoginVisible ? "Logged" : ""}`}>
                 {isUserName ? (
-                  isUserName
+                  <>
+                    <p className="logedUserName">{isUserName}</p>
+                    <button className="LogBtn" onClick={handleLogoutClick}>
+                      Log Out
+                    </button>
+                  </>
                 ) : (
                   <>
                     <button className="LogBtn" onClick={handleLoginClick}>
@@ -69,7 +86,7 @@ function Main() {
                 onLoginSuccess={handleLoginSuccess}
               />
             )}
-            {isSigninVisivle && <Signin onClose={handleCloseSign} />}
+            {isSigninVisible && <Signin onClose={handleCloseSign} />}
           </div>
         </div>
       </div>

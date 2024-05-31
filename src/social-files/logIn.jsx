@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { HiX } from "react-icons/hi";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase"; // Ensure correct import path
+import { auth } from "../firebase";
+// import axios from "axios";
 
 function LogIn({ onClose, onLoginSuccess }) {
   const [email, setEmail] = useState("");
@@ -37,7 +38,9 @@ function LogIn({ onClose, onLoginSuccess }) {
         // Signed in
         const user = userCredential.user;
         // Call the success callback if provided
+        console.log(user.displayName);
         if (onLoginSuccess) {
+        // localStorage.setItem('isLogedIn', true);
           onLoginSuccess(user);
         }
         // Close the form
