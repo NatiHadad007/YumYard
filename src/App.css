@@ -6,14 +6,14 @@
   color: black;
 }
 
+body {
+  overflow-x: hidden;
+}
+
 .App {
   text-align: center;
   background-color: #fcc6bc;
 }
-
-/* .App-link {
-  color: #61dafb;
-} */
 
 section.main {
   display: flex;
@@ -26,8 +26,8 @@ section.main {
 .container {
   width: 100%;
   background-color: white;
-  height: 1200px;
   border-radius: 50px;
+  min-height: 1200px;
 }
 .navBar {
   width: 100%;
@@ -51,7 +51,10 @@ section.main {
 }
 
 a.siteName-link {
+  display: flex;
+  gap: 20px;
   text-decoration: none;
+  align-items: center;
 }
 
 .searchInput {
@@ -104,13 +107,12 @@ button.LogBtn:hover {
   background-color: rgba(173, 173, 184, 0.35);
 }
 
-.logInPopupContainer {
+.PopupContainer {
   align-items: flex-start;
   bottom: 0;
   display: flex;
   justify-content: center;
   left: 0;
-  overflow: hidden;
   position: fixed;
   right: 0;
   top: 0;
@@ -145,6 +147,13 @@ svg.exitPopup {
   width: 40px;
   padding: 15px 5px 0 0;
   height: 21px;
+}
+
+svg.exitBanner {
+  cursor: pointer;
+  width: 40px;
+  height: 21px;
+  z-index: 1;
 }
 
 .popupHeader {
@@ -219,4 +228,252 @@ svg.exitPopup {
 .btnSign {
   background-color: #fc5832;
   color: white;
+}
+
+.confirm-profile-picture {
+  display: flex;
+  flex-direction: column;
+}
+
+.confirm-profile-picture input {
+  background: none;
+}
+
+p.logedUserName {
+  cursor: pointer;
+  text-transform: capitalize;
+}
+
+img.profileImage {
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  border: 0.125rem solid rgb(252 198 188 / 68%);
+  border-radius: 112%;
+  box-sizing: border-box;
+}
+
+svg.logOutIcon {
+  font-size: 16px;
+  position: relative;
+  top: 2px;
+}
+
+.bannerContainer {
+  width: 400px;
+  top: 25px;
+  right: -400px;
+  border-radius: 50px;
+  position: absolute;
+  height: 700px;
+  background: #f1f1ff;
+  transition: right 0.6s ease-in-out;
+}
+
+.bannerContainer.slide-in {
+  right: 25px; /* Final position inside the screen */
+}
+
+.bannerContainer.slide-out {
+  right: -400px;
+}
+img.profileCover {
+  width: 100%;
+  position: relative;
+  bottom: 60px;
+}
+
+.bannerBody {
+  height: 100%;
+}
+
+.profileInfoContainer {
+  border-radius: 50px;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  position: relative;
+  bottom: 105px;
+  height: 100%;
+  background: #fff3f1;
+}
+
+.profileInfo {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  position: relative;
+  flex-direction: column;
+}
+
+img.profilePicture {
+  width: 93px;
+  transform: scale(1.1);
+  height: 93px;
+  position: relative;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  bottom: 54px;
+  border-radius: 50%;
+}
+
+/* HTML: <div class="loader"></div> */
+.loader {
+  width: 50px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(farthest-side, #ffa516 94%, #0000) top/8px 8px
+      no-repeat,
+    conic-gradient(#0000 30%, #ffa516);
+  animation: l13 1s infinite linear;
+}
+@keyframes l13 {
+  100% {
+    transform: rotate(1turn);
+  }
+}
+
+.DishesFollowersContainer {
+  display: flex;
+}
+
+.divider {
+  width: 95px;
+  border-right: 1px solid #00000038;
+}
+
+.followingSection {
+  width: 95px;
+}
+
+.profileDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: relative;
+  bottom: 45px;
+}
+
+.dashboard {
+  display: flex;
+  padding: 40px 70px;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.dashboardBody {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+  width: 570px;
+}
+
+.dashboardBody h2 {
+  font-size: 30px;
+}
+
+.dashboardPosts {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  gap: 20px;
+}
+
+.PostBar {
+  width: 100%;
+  cursor: pointer;
+  text-align: left;
+  border-radius: 20px;
+  padding: 13px 13px 13px 8px;
+  transition: 0.4s ease-in-out;
+  background-color: rgb(252 198 188 / 42%);
+}
+
+.PostBar:hover {
+  background-color: rgb(235 121 100 / 42%);
+}
+
+.userTextArea {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  background-color: transparent;
+}
+
+.userTextArea:focus-visible {
+  outline: none;
+}
+
+.recipeHeader {
+  text-align: left;
+}
+
+.addingCoverImageButton {
+  font-size: 26px;
+  cursor: pointer;
+  flex-direction: column;
+  z-index: 1;
+}
+
+.bannerButtons {
+  display: flex;
+  max-width: 363px;
+  width: 100%;
+  height: 56px;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: end;
+}
+
+.bannerButtonsContainer {
+  display: flex;
+  justify-content: center;
+}
+
+.dishesContainer h4 {
+  text-align: left;
+}
+
+.popupHeader.recipeHeader {
+  display: flex;
+  gap: 20px;
+  flex-direction: column;
+}
+
+.postsBody {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  gap: 20px;
+}
+
+.userNameAndImg {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  padding-bottom: 15px;
+}
+
+.postItem {
+  width: 680px;
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
+    rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+  padding: 20px;
+  background: #fcc6bc45;
+  box-sizing: border-box;
+  height: auto;
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.dateSpan {
+  color: gray;
+}
+
+p.userText {
+  font-weight: 500;
+  overflow-wrap: break-word;
 }
