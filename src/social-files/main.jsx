@@ -1,94 +1,87 @@
-import { Link } from "react-router-dom";
-import React, { useState, useEffect } from "react";
-import { BiSearchAlt } from "react-icons/bi";
-import LogIn from "./logIn";
-import Signin from "./signIn";
-
+import React, { useState, useEffect, useContext } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../firebase.js";
+import Posting from "./posting";
+import Navbar from "./navbar";
+import { PostsContext } from "../context/PostsProvider.jsx";
 function Main() {
-  const [isLoginVisible, setIsLoginVisible] = useState(false);
-  const [isSigninVisible, setIsSigninVisible] = useState(false);
-  const [isUserName, setUserName] = useState("");
+  const [isPostVisible, setIsPostVisible] = useState(false);
+  const [user, setUser] = useState(null);
+  const { posts, setPosts, loading, setLoading, fetchPosts } =
+    useContext(PostsContext);
 
   useEffect(() => {
-    const storedUsername = localStorage.getItem('username');
-    if (storedUsername) {
-      setUserName(storedUsername);
-    }
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser);
+        fetchPosts();
+      } else {
+        console.log("not auth");
+        setUser(null);
+        setLoading(false); // Stop loading if not authenticated
+      }
+    });
+    return () => unsubscribe(); // Clean up the listener on unmount
   }, []);
 
   const handleLoginClick = () => {
-    setIsLoginVisible(true);
-  };
-  
-  const handleLogoutClick = () => {
-    localStorage.removeItem('username');
-    setUserName("");
+    setIsPostVisible(true);
   };
 
-  const handleCloseLogin = () => {
-    setIsLoginVisible(false);
-  };
-
-  const handleSigninClick = () => {
-    setIsSigninVisible(true);
-  };
-
-  const handleCloseSign = () => {
-    setIsSigninVisible(false);
-  };
-
-  const handleLoginSuccess = (user) => {
-    localStorage.setItem('username', user.displayName);
-    setUserName(user.displayName);
-    setIsLoginVisible(false); // Close the login modal on successful login
+  const handleClosePost = () => {
+    setIsPostVisible(false);
   };
 
   return (
     <section className="main">
       <div className="container">
-        <div className="navBar">
-          <div className="navElementWrapper">
-            <Link className="siteName-link" to="/">
-              <h1 className="siteName">YumYard</h1>
-            </Link>
-            <div className="searchInputContainer">
-              <BiSearchAlt className="searchIcon" />
-              <input
-                className="searchInput"
-                type="text"
-                placeholder="Search..."
-              />
-            </div>
-            <div className="profileDetailsSection">
-              <div className={`signOrLogContainer${isLoginVisible ? "Logged" : ""}`}>
-                {isUserName ? (
-                  <>
-                    <p className="logedUserName">{isUserName}</p>
-                    <button className="LogBtn" onClick={handleLogoutClick}>
-                      Log Out
-                    </button>
-                  </>
+        <Navbar />
+        {user ? (
+          <div className="dashboard">
+            <div className="dashboardBody">
+              <h2>Stories</h2>
+              <span>no stories available...</span>
+              <div className="dashboardPosts">
+                <h2>Recent Posts</h2>
+                <span className="PostBar" onClick={handleLoginClick}>
+                  What a delicious recipe are you thinking of?
+                </span>
+                {loading ? (
+                  <div>Loading posts...</div>
                 ) : (
-                  <>
-                    <button className="LogBtn" onClick={handleLoginClick}>
-                      Log in
-                    </button>
-                    <button className="SignBtn" onClick={handleSigninClick}>
-                      Sign Up
-                    </button>
-                  </>
+                  <div className="postsBody">
+                    {posts.length > 0 ? (
+                      posts.map((postData) => (
+                        <div key={postData.postId} className="postItem">
+                          <div className="userNameAndImg">
+                            <img
+                              className="profileImage"
+                              src={postData.user.profileImage}
+                              alt="user-profile-images"
+                            />
+                            <h3>{postData.user.firstName}</h3>
+                          </div>
+                          <p className="userText">{postData.content}</p>
+                          <span className="dateSpan">
+                            Posted on:{" "}
+                            {new Date(postData.createdAt).toLocaleString()}
+                          </span>
+                        </div>
+                      ))
+                    ) : (
+                      <span>No posts available...</span>
+                    )}
+                  </div>
                 )}
               </div>
+              {isPostVisible && <Posting onClose={handleClosePost} />}
             </div>
-            {isLoginVisible && (
-              <LogIn
-                onClose={handleCloseLogin}
-                onLoginSuccess={handleLoginSuccess}
-              />
-            )}
-            {isSigninVisible && <Signin onClose={handleCloseSign} />}
           </div>
-        </div>
+        ) : (
+          <div className="dashboard">
+            <h2>Please log in to view the posts and share your recipes.</h2>
+          </div>
+        )}
       </div>
     </section>
   );

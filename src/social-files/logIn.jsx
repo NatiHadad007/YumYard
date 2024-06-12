@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, {useRef,useState, useEffect } from "react";
 import { HiX } from "react-icons/hi";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
-// import axios from "axios";
 
 function LogIn({ onClose, onLoginSuccess }) {
+  const buttonRef = useRef(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
@@ -18,6 +18,8 @@ function LogIn({ onClose, onLoginSuccess }) {
     }
   }, [email, password]);
 
+
+
   const handleInputChange = (e) => {
     const { id, value } = e.target;
     if (id === "email") {
@@ -28,7 +30,9 @@ function LogIn({ onClose, onLoginSuccess }) {
     }
   };
 
-  const handleOnClick = () => {
+  const handleSubmit = (e) => {
+    console.log(e)
+    e.preventDefault();
     if (!allFieldsFilled) {
       setErrorMsg("* All fields are required.");
       return;
@@ -38,7 +42,6 @@ function LogIn({ onClose, onLoginSuccess }) {
         // Signed in
         const user = userCredential.user;
         // Call the success callback if provided
-        console.log(user.displayName);
         if (onLoginSuccess) {
         // localStorage.setItem('isLogedIn', true);
           onLoginSuccess(user);
@@ -55,7 +58,7 @@ function LogIn({ onClose, onLoginSuccess }) {
   };
 
   return (
-    <div className="logInPopupContainer">
+    <div className="PopupContainer">
       <div className="popupBody">
         <div className="popUpexit">
           <HiX className="exitPopup" onClick={onClose} />
@@ -64,7 +67,7 @@ function LogIn({ onClose, onLoginSuccess }) {
           <h2>Log in to YumYard</h2>
         </div>
         <div className="popupForm">
-          <form action="">
+          <form action="" onSubmit={handleSubmit}>
             <label htmlFor="">email</label>
             <input
               type="text"
@@ -80,15 +83,14 @@ function LogIn({ onClose, onLoginSuccess }) {
               onChange={handleInputChange}
             />
             <p className="errorMsg">{errorMsg}</p>
-          </form>
-          <div className="footer">
             <button
               type="submit"
               className={`btn${allFieldsFilled ? " btnSign" : ""}`}
-              onClick={handleOnClick}
             >
               Sign up
             </button>
+          </form>
+          <div className="footer">
           </div>
         </div>
       </div>

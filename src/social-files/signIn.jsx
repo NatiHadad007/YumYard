@@ -1,32 +1,37 @@
 import React, { useState, useEffect } from "react";
 import { HiX } from "react-icons/hi";
-import { auth, database } from "../firebase";
+import { storage, auth, database } from "../firebase";
 import LogIn from "./logIn";
-import { ref, push, child, update, set } from "firebase/database";
+import { ref, set } from "firebase/database";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { ref as storageRef,uploadBytes, getDownloadURL } from "firebase/storage";
+import { v4 } from 'uuid';
 
-function SignIn({ onClose }) {
+function SignIn({ onClose, onSigninSuccess }) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [profileImage, setProfileImage] = useState(null);
   const [errorMsg, setErrorMsg] = useState("");
   const [isPasswordMatch, setIsPasswordMatch] = useState(false);
   const [allFieldsFilled, setAllFieldsFilled] = useState(false);
-  const [redirectToLogin, setRedirectToLogin] = useState(false); // State for redirecting to login
+  const [redirectToLogin, setRedirectToLogin] = useState(false);
 
   useEffect(() => {
     // Check if all fields are filled
     if (firstName && lastName && email && password && confirmPassword) {
       setAllFieldsFilled(true);
+      // if (firstName.length < 6 && lastName.length < 6 && password < 15) {
+      // }
     } else {
       setAllFieldsFilled(false);
     }
-  }, [firstName, lastName, email, password, confirmPassword]);
+  }, [firstName, lastName,profileImage, email , password, confirmPassword]);
 
   const handleInputChange = (e) => {
-    const { id, value } = e.target;
+    const { id, value, files } = e.target;
     switch (id) {
       case "firstName":
         setFirstName(value);
@@ -43,12 +48,15 @@ function SignIn({ onClose }) {
       case "confirmPassword":
         setConfirmPassword(value);
         break;
+      case "profileImage":
+        setProfileImage(files[0]);
+        break;
       default:
         break;
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!allFieldsFilled) {
       setErrorMsg("* All fields are required.");
       setIsPasswordMatch(false);
@@ -58,20 +66,30 @@ function SignIn({ onClose }) {
     if (password === confirmPassword) {
       setErrorMsg("");
       createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
+        .then(async(userCredential) => {
           const user = userCredential.user;
           const userId = user.uid;
-
-          // Update the user's profile to include the displayName
+          let profileImageUrl = "";
+              if (profileImage != null) {
+                const imageRef = storageRef(storage, `profileImages/${profileImage.name + v4()}`);
+                await uploadBytes(imageRef, profileImage);
+                profileImageUrl = await getDownloadURL(imageRef);
+              }
           updateProfile(user, {
-            displayName: `${firstName} ${lastName}`,
+            //if you want to display the first & last name:displayName: `${firstName} ${lastName}`,
+            displayName: `${firstName}`,
+            photoURL: profileImageUrl
           })
             .then(() => {
+              if (onSigninSuccess) {
+                onSigninSuccess(user, profileImageUrl);
+                }
               // Save additional user info in Realtime Database
               set(ref(database, "users/" + userId), {
                 firstName: firstName,
                 lastName: lastName,
                 email: email,
+                profileImage: profileImageUrl,
               })
                 .then(() => {
                   // Close the form and redirect to login
@@ -103,7 +121,7 @@ function SignIn({ onClose }) {
   }
 
   return (
-    <div className="logInPopupContainer">
+    <div className="PopupContainer">
       <div className="popupBody">
         <div className="popUpexit">
           <HiX className="exitPopup" onClick={onClose} />
@@ -149,6 +167,17 @@ function SignIn({ onClose }) {
                 onChange={handleInputChange}
               />
             </div>
+             <div className="confirm-profile-picture">
+              <label className="form__label" htmlFor="profileImage">
+                Chose your profile image (Adittional)
+              </label>
+              <input
+                className="form__input"
+                type="file"
+                id="profileImage"
+                onChange={handleInputChange}
+              />
+            </div>
             <div className="password">
               <label className="form__label" htmlFor="password">
                 Password
@@ -180,8 +209,7 @@ function SignIn({ onClose }) {
               type="submit"
               className={`btn${allFieldsFilled ? " btnSign" : ""}`}
               onClick={handleSubmit}
-            >
-              Sign up
+            > Sign up
             </button>
           </div>
         </div>
