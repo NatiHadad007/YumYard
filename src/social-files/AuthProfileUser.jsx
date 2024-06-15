@@ -5,8 +5,6 @@ import LogIn from "./logIn";
 import { MdLogout } from "react-icons/md";
 import Signin from "./signIn";
 import Banner from "./profileBanner";
-import Skeleton from "react-loading-skeleton";
-import "react-loading-skeleton/dist/skeleton.css";
 import { AuthContext } from "../context/AuthProvider";
 function AuthProfileUser() {
   const [isLoginVisible, setIsLoginVisible] = useState(false);
@@ -86,9 +84,7 @@ function AuthProfileUser() {
               onClick={toggleProfileBanner}
               src={
                 userData.profileImage ||
-                "https://cdn0.iconfinder.com/data/icons/actions-ono-system-core/30/account_circle-profile-profile_picture-default_picture-512.png" || (
-                  <Skeleton />
-                )
+                "https://cdn0.iconfinder.com/data/icons/actions-ono-system-core/30/account_circle-profile-profile_picture-default_picture-512.png"
               }
               alt="profile_image"
             />

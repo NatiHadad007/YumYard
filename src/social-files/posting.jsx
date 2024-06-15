@@ -36,11 +36,6 @@ function Posting({ onClose }) {
     try {
       const newPostData = await createPost(user.uid, postData);
       if (newPostData) {
-        // const userData = await fetchUser(newPostData.userId);
-        // const postWithUserData = { ...newPostData, user: userData };
-        // setPosts((prevPosts) => [postWithUserData, ...prevPosts]); // Add the new post to the state
-
-        // console.log("Post created and added to state:", postWithUserData);
         setUserText("");
         onClose(); // Close the popup after submission
       }

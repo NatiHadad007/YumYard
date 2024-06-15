@@ -4,8 +4,12 @@ import { storage, auth, database } from "../firebase";
 import LogIn from "./logIn";
 import { ref, set } from "firebase/database";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { ref as storageRef,uploadBytes, getDownloadURL } from "firebase/storage";
-import { v4 } from 'uuid';
+import {
+  ref as storageRef,
+  uploadBytes,
+  getDownloadURL,
+} from "firebase/storage";
+import { v4 } from "uuid";
 
 function SignIn({ onClose, onSigninSuccess }) {
   const [firstName, setFirstName] = useState("");
@@ -28,7 +32,7 @@ function SignIn({ onClose, onSigninSuccess }) {
     } else {
       setAllFieldsFilled(false);
     }
-  }, [firstName, lastName,profileImage, email , password, confirmPassword]);
+  }, [firstName, lastName, profileImage, email, password, confirmPassword]);
 
   const handleInputChange = (e) => {
     const { id, value, files } = e.target;
@@ -66,24 +70,27 @@ function SignIn({ onClose, onSigninSuccess }) {
     if (password === confirmPassword) {
       setErrorMsg("");
       createUserWithEmailAndPassword(auth, email, password)
-        .then(async(userCredential) => {
+        .then(async (userCredential) => {
           const user = userCredential.user;
           const userId = user.uid;
           let profileImageUrl = "";
-              if (profileImage != null) {
-                const imageRef = storageRef(storage, `profileImages/${profileImage.name + v4()}`);
-                await uploadBytes(imageRef, profileImage);
-                profileImageUrl = await getDownloadURL(imageRef);
-              }
+          if (profileImage != null) {
+            const imageRef = storageRef(
+              storage,
+              `profileImages/${profileImage.name + v4()}`
+            );
+            await uploadBytes(imageRef, profileImage);
+            profileImageUrl = await getDownloadURL(imageRef);
+          }
           updateProfile(user, {
             //if you want to display the first & last name:displayName: `${firstName} ${lastName}`,
             displayName: `${firstName}`,
-            photoURL: profileImageUrl
+            photoURL: profileImageUrl,
           })
             .then(() => {
               if (onSigninSuccess) {
                 onSigninSuccess(user, profileImageUrl);
-                }
+              }
               // Save additional user info in Realtime Database
               set(ref(database, "users/" + userId), {
                 firstName: firstName,
@@ -167,7 +174,7 @@ function SignIn({ onClose, onSigninSuccess }) {
                 onChange={handleInputChange}
               />
             </div>
-             <div className="confirm-profile-picture">
+            <div className="confirm-profile-picture">
               <label className="form__label" htmlFor="profileImage">
                 Chose your profile image (Adittional)
               </label>
@@ -209,7 +216,9 @@ function SignIn({ onClose, onSigninSuccess }) {
               type="submit"
               className={`btn${allFieldsFilled ? " btnSign" : ""}`}
               onClick={handleSubmit}
-            > Sign up
+            >
+              {" "}
+              Sign up
             </button>
           </div>
         </div>

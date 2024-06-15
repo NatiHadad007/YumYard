@@ -2,17 +2,23 @@ import React, { useState, useEffect, useContext } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebase.js";
 import Posting from "./posting";
-import Navbar from "./navbar";
+import Navbar from "./navBar";
 import { PostsContext } from "../context/PostsProvider.jsx";
+import { FaRegTrashAlt } from "react-icons/fa";
+import { RiEditLine } from "react-icons/ri";
+import { onValue, ref, remove, query, orderByChild } from "firebase/database";
+import { database } from "../firebase.js";
+
 function Main() {
   const [isPostVisible, setIsPostVisible] = useState(false);
   const [user, setUser] = useState(null);
-  const { posts, setPosts, loading, setLoading, fetchPosts } =
-    useContext(PostsContext);
+  const { posts, loading, setLoading, fetchPosts } = useContext(PostsContext);
+  const [currentUserId, setcurrentUserId] = useState();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
+        setcurrentUserId(currentUser.uid);
         setUser(currentUser);
         fetchPosts();
       } else {
@@ -30,6 +36,30 @@ function Main() {
 
   const handleClosePost = () => {
     setIsPostVisible(false);
+  };
+
+  const handleTrashClick = async (postId, e) => {
+    e.preventDefault();
+
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this post?"
+    );
+    if (confirmDelete) {
+      const postRef = ref(database, `posts/${postId}`);
+      try {
+        await remove(postRef);
+        console.log(`Post with ID ${postId} deleted successfully`);
+        fetchPosts();
+      } catch (error) {
+        console.error("Error deleting post:", error.message);
+      }
+    } else {
+      console.log("Post deletion canceled");
+    }
+  };
+
+  const handleEditClick = async (postId, e) => {
+    e.preventDefault();
   };
 
   return (
@@ -66,6 +96,22 @@ function Main() {
                             Posted on:{" "}
                             {new Date(postData.createdAt).toLocaleString()}
                           </span>
+                          {postData.userId === currentUserId && (
+                            <div className="trashIconContainer">
+                              <FaRegTrashAlt
+                                className="trashIcon"
+                                onClick={(e) =>
+                                  handleTrashClick(postData.postId, e)
+                                }
+                              />
+                              <RiEditLine
+                                className="editIcon"
+                                onClick={(e) =>
+                                  handleEditClick(postData.postId, e)
+                                }
+                              />
+                            </div>
+                          )}
                         </div>
                       ))
                     ) : (
@@ -79,7 +125,9 @@ function Main() {
           </div>
         ) : (
           <div className="dashboard">
-            <h2>Please log in to view the posts and share your recipes.</h2>
+            <h2>
+              Please log in first to view the posts and share your recipes.
+            </h2>
           </div>
         )}
       </div>

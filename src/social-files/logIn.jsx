@@ -1,4 +1,4 @@
-import React, {useRef,useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { HiX } from "react-icons/hi";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
@@ -18,8 +18,6 @@ function LogIn({ onClose, onLoginSuccess }) {
     }
   }, [email, password]);
 
-
-
   const handleInputChange = (e) => {
     const { id, value } = e.target;
     if (id === "email") {
@@ -31,7 +29,7 @@ function LogIn({ onClose, onLoginSuccess }) {
   };
 
   const handleSubmit = (e) => {
-    console.log(e)
+    console.log(e);
     e.preventDefault();
     if (!allFieldsFilled) {
       setErrorMsg("* All fields are required.");
@@ -43,7 +41,7 @@ function LogIn({ onClose, onLoginSuccess }) {
         const user = userCredential.user;
         // Call the success callback if provided
         if (onLoginSuccess) {
-        // localStorage.setItem('isLogedIn', true);
+          // localStorage.setItem('isLogedIn', true);
           onLoginSuccess(user);
         }
         // Close the form
@@ -90,8 +88,7 @@ function LogIn({ onClose, onLoginSuccess }) {
               Sign up
             </button>
           </form>
-          <div className="footer">
-          </div>
+          <div className="footer"></div>
         </div>
       </div>
     </div>
