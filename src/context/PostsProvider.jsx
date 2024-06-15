@@ -79,7 +79,7 @@ const PostsProvider = ({ children }) => {
           postsWithUserData.sort(
             (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
           );
-          console.log(postsWithUserData);
+          // console.log(postsWithUserData);
           setPosts(postsWithUserData);
         }
         setLoading(false);
