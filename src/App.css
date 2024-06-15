@@ -278,8 +278,12 @@ svg.logOutIcon {
   right: -400px;
 }
 img.profileCover {
+  border-radius: 50px 50px 0 0;
   width: 100%;
   position: relative;
+  filter: brightness(80%);
+  max-width: 400px;
+  max-height: 400px;
   bottom: 60px;
 }
 
@@ -443,6 +447,7 @@ img.profilePicture {
 }
 
 .postsBody {
+  padding: 20px 0 0 0;
   display: flex;
   flex-direction: column;
   text-align: left;
@@ -476,4 +481,45 @@ img.profilePicture {
 p.userText {
   font-weight: 500;
   overflow-wrap: break-word;
+}
+
+.postItem.bannerItem {
+  max-width: 310px;
+}
+
+.file-input-container {
+  position: relative;
+  display: inline-block;
+}
+
+.hidden {
+  display: none; /* Hide the original file input */
+}
+
+.custom-file-label {
+  display: inline-block;
+  padding: 10px 20px;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.addingCoverImageButton {
+  margin-right: 8px;
+  font-size: 24px;
+}
+
+.trashIconContainer {
+  gap: 6px;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: flex-end;
+}
+
+svg.trashIcon,
+svg.editIcon {
+  cursor: pointer;
 }
