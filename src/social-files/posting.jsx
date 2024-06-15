@@ -7,7 +7,8 @@ function Posting({ onClose }) {
   const [userText, setUserText] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const { newPostCreated, toggleNewPostCreated } = useContext(AuthContext);
-  const { createPost, setPosts, fetchUser } = useContext(PostsContext);
+  const { createPost, editPostData, setEditPostData } =
+    useContext(PostsContext);
 
   const handleInputChange = (e) => {
     const value = e.target.value;
@@ -37,7 +38,8 @@ function Posting({ onClose }) {
       const newPostData = await createPost(user.uid, postData);
       if (newPostData) {
         setUserText("");
-        onClose(); // Close the popup after submission
+        onClose();
+        setEditPostData("");
       }
     } catch (error) {
       console.error("Error creating post:", error.message);
@@ -57,7 +59,7 @@ function Posting({ onClose }) {
           <form onSubmit={handleSubmit}>
             <textarea
               className="userTextArea"
-              value={userText}
+              value={editPostData !== "" ? editPostData : userText}
               autoFocus
               onChange={handleInputChange}
               placeholder="Burger?, Pizza? or any new idea"

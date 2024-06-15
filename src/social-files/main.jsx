@@ -6,13 +6,14 @@ import Navbar from "./navBar";
 import { PostsContext } from "../context/PostsProvider.jsx";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { RiEditLine } from "react-icons/ri";
-import { onValue, ref, remove, query, orderByChild } from "firebase/database";
+import { ref, remove } from "firebase/database";
 import { database } from "../firebase.js";
 
 function Main() {
   const [isPostVisible, setIsPostVisible] = useState(false);
   const [user, setUser] = useState(null);
-  const { posts, loading, setLoading, fetchPosts } = useContext(PostsContext);
+  const { posts, loading, setLoading, fetchPosts, editPost, setEditPostData } =
+    useContext(PostsContext);
   const [currentUserId, setcurrentUserId] = useState();
 
   useEffect(() => {
@@ -30,8 +31,9 @@ function Main() {
     return () => unsubscribe(); // Clean up the listener on unmount
   }, []);
 
-  const handleLoginClick = () => {
+  const handleInputClick = () => {
     setIsPostVisible(true);
+    setEditPostData("");
   };
 
   const handleClosePost = () => {
@@ -59,7 +61,9 @@ function Main() {
   };
 
   const handleEditClick = async (postId, e) => {
+    editPost(postId);
     e.preventDefault();
+    setIsPostVisible(true);
   };
 
   return (
@@ -73,7 +77,7 @@ function Main() {
               <span>no stories available...</span>
               <div className="dashboardPosts">
                 <h2>Recent Posts</h2>
-                <span className="PostBar" onClick={handleLoginClick}>
+                <span className="PostBar" onClick={handleInputClick}>
                   What a delicious recipe are you thinking of?
                 </span>
                 {loading ? (
