@@ -15,6 +15,7 @@ export const PostsContext = createContext();
 const PostsProvider = ({ children }) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [editPostData, setEditPostData] = useState(null);
 
   const createPost = async (userId, postData) => {
     try {
@@ -57,6 +58,22 @@ const PostsProvider = ({ children }) => {
     });
   };
 
+  const editPost = (userPostId) => {
+    const postRef = ref(database, `posts/${userPostId}`);
+    onValue(
+      postRef,
+      async (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          setEditPostData(data.content);
+        }
+      },
+      (error) => {
+        console.error("Error fetching posts:", error.message);
+      }
+    );
+  };
+
   const fetchPosts = () => {
     console.log("fetching");
     setLoading(true);
@@ -95,11 +112,14 @@ const PostsProvider = ({ children }) => {
     <PostsContext.Provider
       value={{
         posts,
-        setPosts,
         loading,
+        editPostData,
+        setPosts,
         setLoading,
         fetchPosts,
+        setEditPostData,
         fetchUser,
+        editPost,
         createPost,
       }}
     >
