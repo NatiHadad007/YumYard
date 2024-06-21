@@ -12,8 +12,15 @@ import { database } from "../firebase.js";
 function Main() {
   const [isPostVisible, setIsPostVisible] = useState(false);
   const [user, setUser] = useState(null);
-  const { posts, loading, setLoading, fetchPosts, editPost, setEditPostData } =
-    useContext(PostsContext);
+  const {
+    posts,
+    loading,
+    setLoading,
+    fetchPosts,
+    editPost,
+    setEditPostData,
+    isPostImage,
+  } = useContext(PostsContext);
   const [currentUserId, setcurrentUserId] = useState();
 
   useEffect(() => {
@@ -23,7 +30,6 @@ function Main() {
         setUser(currentUser);
         fetchPosts();
       } else {
-        console.log("not auth");
         setUser(null);
         setLoading(false); // Stop loading if not authenticated
       }
@@ -96,6 +102,15 @@ function Main() {
                             <h3>{postData.user.firstName}</h3>
                           </div>
                           <p className="userText">{postData.content}</p>
+                          {postData.postImages && (
+                            <div className="postImageContainer">
+                              <img
+                                src={postData.postImages}
+                                className="postImage"
+                                alt="post-image"
+                              />
+                            </div>
+                          )}
                           <span className="dateSpan">
                             Posted on:{" "}
                             {new Date(postData.createdAt).toLocaleString()}

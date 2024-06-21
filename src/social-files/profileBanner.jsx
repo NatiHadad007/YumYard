@@ -94,7 +94,7 @@ const ProfileBanner = () => {
 
   const isValidText = (content) => {
     const maxLength = 100;
-    if (content.length >= 100) {
+    if (content && content.length >= 100) {
       const truncatedString = content.slice(0, maxLength);
       return truncatedString + "...";
     }
@@ -113,7 +113,7 @@ const ProfileBanner = () => {
         setUserId(null);
       }
     });
-  }, []);
+  }, [coverImage]);
 
   return (
     <div
