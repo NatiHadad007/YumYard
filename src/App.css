@@ -283,7 +283,7 @@ img.profileCover {
   position: relative;
   filter: brightness(80%);
   max-width: 400px;
-  max-height: 400px;
+  max-height: 345px;
   bottom: 60px;
 }
 
@@ -498,7 +498,6 @@ p.userText {
 
 .custom-file-label {
   display: inline-block;
-  padding: 10px 20px;
   color: white;
   border-radius: 5px;
   cursor: pointer;
@@ -522,4 +521,20 @@ p.userText {
 svg.trashIcon,
 svg.editIcon {
   cursor: pointer;
+}
+
+.submitingContainer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.postImageContainer {
+  display: flex;
+  padding: 15px 15px 15px 0;
+  flex-direction: column;
+}
+
+img.postImage {
+  width: 100%;
+  border-radius: 16px;
 }
