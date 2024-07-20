@@ -42,9 +42,9 @@ const PostsProvider = ({ children }) => {
 
       console.log("Post created successfully:", postId);
       setIsPostImage("");
-      return newPostData; // Return the newly created post data
+      return newPostData;
     } catch (error) {
-      console.error("Error creating post:", error.message);
+      console.error("Error creating post:", error);
     }
   };
 
