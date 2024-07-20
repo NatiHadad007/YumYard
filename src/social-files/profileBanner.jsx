@@ -1,15 +1,7 @@
 import React, { useState, useContext, useRef, useEffect } from "react";
 import { HiX } from "react-icons/hi";
 import { BiSolidImageAdd } from "react-icons/bi";
-
-import {
-  onValue,
-  ref,
-  set,
-  push,
-  query,
-  orderByChild,
-} from "firebase/database";
+import { onValue, ref, set } from "firebase/database";
 import { AuthContext } from "../context/AuthProvider";
 import { onAuthStateChanged } from "firebase/auth";
 import { storage, auth, database } from "../firebase";
@@ -23,6 +15,9 @@ const ProfileBanner = () => {
   const [isImageLoaded, setImageLoaded] = useState(false);
   const [coverImage, setCoverImage] = useState(null);
   const [userId, setUserId] = useState(null);
+  const [profileImageSrc, setProfileImageSrc] = useState(
+    "https://cdn0.iconfinder.com/data/icons/actions-ono-system-core/30/account_circle-profile-profile_picture-default_picture-512.png"
+  );
   const {
     profileBannerVisible,
     toggleProfileBanner,
@@ -31,28 +26,40 @@ const ProfileBanner = () => {
     postLength,
   } = useContext(AuthContext);
 
-  const fetchUser = () => {
-    return new Promise((resolve, reject) => {
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUserId(user.uid);
+      } else {
+        setUserId(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (userId) {
       const userRef = ref(database, `users/${userId}/`);
       onValue(
         userRef,
         (snapshot) => {
           const data = snapshot.val();
           if (data) {
-            resolve(data);
             setCoverImage(data.coverImage);
+            console.log(data);
+            setProfileImageSrc(data.profileImage);
           }
         },
         (error) => {
-          reject(error.message);
+          console.error("Error fetching user data:", error.message);
         }
       );
-    });
-  };
+    }
+  }, [userId]);
 
   const handleImageLoad = () => {
     setImageLoaded(true);
-    fetchUser();
   };
 
   const fileInputRef = useRef(null);
@@ -60,28 +67,23 @@ const ProfileBanner = () => {
   const handleClick = async (e) => {
     const { files } = e.target;
     if (files && files.length > 0) {
-      setCoverImage(files[0]);
-      const usersId = userId;
       const file = files[0];
       const storageReference = storageRef(
         storage,
-        `coverImages/${usersId}/${file.name}`
+        `coverImages/${userId}/${file.name}`
       );
 
       try {
-        // Upload file to Firebase Storage
         const snapshot = await uploadBytes(storageReference, file);
-
-        // Get the download URL of the uploaded file
         const downloadURL = await getDownloadURL(snapshot.ref);
 
-        // Update the user's profile in the Realtime Database
-        const userRef = ref(database, `users/${usersId}`);
+        const userRef = ref(database, `users/${userId}`);
         await set(userRef, {
-          ...userData, // Keep existing user data
-          coverImage: downloadURL, // Update with new cover image URL
+          ...userData,
+          coverImage: downloadURL,
         });
 
+        setCoverImage(downloadURL);
         console.log(
           "Cover image uploaded and URL saved to database:",
           downloadURL
@@ -94,26 +96,14 @@ const ProfileBanner = () => {
 
   const isValidText = (content) => {
     const maxLength = 100;
-    if (content && content.length >= 100) {
-      const truncatedString = content.slice(0, maxLength);
-      return truncatedString + "...";
-    }
-    return content;
+    return content && content.length > maxLength
+      ? `${content.slice(0, maxLength)}...`
+      : content;
   };
 
   const isValidPostData = (postData) => {
     return postData && postData.post && typeof postData.post === "object";
   };
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (posts) => {
-      if (posts) {
-        setUserId(posts.uid);
-      } else {
-        setUserId(null);
-      }
-    });
-  }, [coverImage]);
 
   return (
     <div
@@ -138,26 +128,27 @@ const ProfileBanner = () => {
         </div>
       </div>
       <div className="bannerBody">
-        <img
-          src={
-            coverImage ||
-            "https://assets.trafficpointltd.com/app/uploads/sites/9/2024/06/05154745/menu-default-image_220606_web.png"
-          }
-          className="profileCover"
-          alt="profileCover"
-        />
+        <div className="profileCoverWrapper">
+          <img
+            src={
+              coverImage ||
+              "https://assets.trafficpointltd.com/app/uploads/sites/9/2024/06/05154745/menu-default-image_220606_web.png"
+            }
+            className="profileCover"
+            alt="profileCover"
+          />
+        </div>
         <div className="profileInfoContainer">
           <div className="profileInfo">
-            {!isImageLoaded && <div className="loader"></div>}
+            <img
+              src={profileImageSrc}
+              style={{ background: "#f3b7ac" }}
+              className="profilePicture"
+              alt="profilePicture"
+              onLoad={handleImageLoad}
+            />
             {userData && (
               <>
-                <img
-                  src={userData.profileImage}
-                  className="profilePicture"
-                  alt="profilePicture"
-                  onLoad={handleImageLoad}
-                  style={{ display: isImageLoaded ? "block" : "none" }}
-                />
                 <div className="profileDetails">
                   <div className="profileName">
                     <h2>{userData.firstName}</h2>

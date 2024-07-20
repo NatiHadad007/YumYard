@@ -83,9 +83,12 @@ function Main() {
               <span>no stories available...</span>
               <div className="dashboardPosts">
                 <h2>Recent Posts</h2>
-                <span className="PostBar" onClick={handleInputClick}>
-                  What a delicious recipe are you thinking of?
-                </span>
+                <div className="inputContainer">
+                  <span className="PostBar" onClick={handleInputClick}>
+                    What a delicious recipe are you thinking of?
+                  </span>
+                </div>
+
                 {loading ? (
                   <div>Loading posts...</div>
                 ) : (
@@ -96,7 +99,11 @@ function Main() {
                           <div className="userNameAndImg">
                             <img
                               className="profileImage"
-                              src={postData.user.profileImage}
+                              src={
+                                postData.user.profileImage
+                                  ? postData.user.profileImage
+                                  : "https://cdn0.iconfinder.com/data/icons/actions-ono-system-core/30/account_circle-profile-profile_picture-default_picture-512.png"
+                              }
                               alt="user-profile-images"
                             />
                             <h3>{postData.user.firstName}</h3>
